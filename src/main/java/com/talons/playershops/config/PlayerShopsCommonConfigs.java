@@ -17,13 +17,13 @@ public class PlayerShopsCommonConfigs {
     static {
         BUILDER.push("Common configs for Player Shops");
 
-        UseAllowance = BUILDER.comment("{Requires Restart} whether or not to use the allowance system")
+        UseAllowance = BUILDER.comment("whether or not to use the allowance system")
                 .define("UseAllowance", false);
         AllowanceItem = BUILDER.comment("The id of the item given as an allowance")
                 .define("AllowanceItem", "minecraft:raw_gold");
         AllowanceItemCount = BUILDER.comment("The number of items players get given")
                 .define("AllowanceItemCount", 1);
-        AllowanceTimeOfDay = BUILDER.comment("{Requires Restart} The time in ticks between when a player is given there allowance, one day is 24000 ticks, max is one day currently")
+        AllowanceTimeOfDay = BUILDER.comment("The time in ticks between when a player is given there allowance, one day is 24000 ticks, max is one day currently")
                 .define("AllowanceTime", (long)24000);
         AllowanceMessage = BUILDER.comment("The message displayed to players when getting their allowance")
                 .define("AllowanceMessage", "The sun rises and you gain your allowance");

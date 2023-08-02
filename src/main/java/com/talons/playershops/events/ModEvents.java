@@ -29,15 +29,13 @@ import net.minecraftforge.fml.common.Mod;
 @Mod.EventBusSubscriber(modid = "playershops")
 public class ModEvents {
     private static long oldTime;
-    private static final boolean UseAllowance = PlayerShopsCommonConfigs.UseAllowance.get();
-    private static final Long AllowanceTimeOfDay = PlayerShopsCommonConfigs.AllowanceTimeOfDay.get();
     @SubscribeEvent
     public static void onWorldTickEvent(TickEvent.WorldTickEvent event) {
         if(!event.world.isClientSide) {
-            if(UseAllowance) {
+            if(PlayerShopsCommonConfigs.UseAllowance.get()) {
                 if (event.world.getDayTime() != oldTime) {
                     oldTime = event.world.getDayTime();
-                    if (event.world.getDayTime() % AllowanceTimeOfDay == 0) {
+                    if (event.world.getDayTime() % PlayerShopsCommonConfigs.AllowanceTimeOfDay.get() == 0) {
                         for (int i = 0; i < event.world.players().size(); i++) {
                             ItemStack giveItem = Registry.ITEM.get(new ResourceLocation(PlayerShopsCommonConfigs.AllowanceItem.get())).getDefaultInstance();
                             giveItem.setCount(PlayerShopsCommonConfigs.AllowanceItemCount.get());

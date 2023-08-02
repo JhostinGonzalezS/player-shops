@@ -42,11 +42,26 @@ public class PlayerShopBlock extends BaseEntityBlock {
 
 
 
-    public boolean isSignalSource(BlockState p_55213_) {
+    //public boolean isSignalSource(BlockState p_55213_) {
+    //    return true;
+    //}
+
+    public boolean hasAnalogOutputSignal(BlockState p_151986_) {
         return true;
     }
 
-    public int getSignal(BlockState p_55208_, BlockGetter p_55209_, BlockPos p_55210_, Direction p_55211_) {
+    public int getAnalogOutputSignal(BlockState p_153530_, Level p_153531_, BlockPos p_153532_) {
+        BlockEntity entity = p_153531_.getBlockEntity(p_153532_);
+        if(entity instanceof PlayerShopBlockEntity)
+        {
+            return ((PlayerShopBlockEntity) entity).currentPowerLevel;
+        }
+        else {
+            throw new IllegalStateException("Our Container provider is missing!");
+        }
+    }
+
+    /*public int getSignal(BlockState p_55208_, BlockGetter p_55209_, BlockPos p_55210_, Direction p_55211_) {
         BlockEntity entity = p_55209_.getBlockEntity(p_55210_);
         if(entity instanceof PlayerShopBlockEntity) {
             return ((PlayerShopBlockEntity) entity).currentPowerLevel;
@@ -62,7 +77,7 @@ public class PlayerShopBlock extends BaseEntityBlock {
         } else {
             throw new IllegalStateException("Our Container provider is missing!");
         }
-    }
+    }*/
 
     @Override
     public VoxelShape getShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
