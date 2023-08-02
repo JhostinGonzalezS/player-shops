@@ -1,0 +1,22 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        " G ",
+        "LSL",
+        "LLL"
+    ],
+    "key": {
+        "G": {
+            "tag": "forge:glass"
+        },
+        "S": {
+            "item": "minecraft:spruce_sign"
+        },
+        "L": {
+            "item": "minecraft:stripped_spruce_log"
+        }
+    },
+    "result": {
+        "item": "playershops:spruce_player_shop"
+    }
+}

@@ -1,0 +1,22 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        " G ",
+        "LSL",
+        "LLL"
+    ],
+    "key": {
+        "G": {
+            "tag": "forge:glass"
+        },
+        "S": {
+            "item": "minecraft:crimson_sign"
+        },
+        "L": {
+            "item": "minecraft:stripped_crimson_stem"
+        }
+    },
+    "result": {
+        "item": "playershops:crimson_player_shop"
+    }
+}

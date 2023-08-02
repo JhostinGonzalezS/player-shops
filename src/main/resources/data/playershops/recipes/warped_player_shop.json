@@ -1,0 +1,22 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        " G ",
+        "LSL",
+        "LLL"
+    ],
+    "key": {
+        "G": {
+            "tag": "forge:glass"
+        },
+        "S": {
+            "item": "minecraft:warped_sign"
+        },
+        "L": {
+            "item": "minecraft:stripped_warped_stem"
+        }
+    },
+    "result": {
+        "item": "playershops:warped_player_shop"
+    }
+}
