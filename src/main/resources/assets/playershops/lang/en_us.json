@@ -1,0 +1,17 @@
+{
+    "block.playershops.oak_player_shop": "Oak Player Shop",
+    "block.playershops.acacia_player_shop": "Acacia Player Shop",
+    "block.playershops.birch_player_shop": "Birch Player Shop",
+    "block.playershops.crimson_player_shop": "Crimson Player Shop",
+    "block.playershops.dark_oak_player_shop": "Dark Oak Player Shop",
+    "block.playershops.jungle_player_shop": "Jungle Player Shop",
+    "block.playershops.spruce_player_shop": "Spruce Player Shop",
+    "block.playershops.warped_player_shop": "Warped Player Shop",
+
+    "message.playershops.inv_full": "Your inventory is full, please clear space",
+    "message.playershops.no_funds": "Insufficient funds, please hold the payment item",
+    "message.playershops.shop_full_profit": "Shop profit slot is full",
+    "message.playershops.shop_empty_stock": "Shop is out of stock",
+
+    "title.playershops.shop": "Your Shop"
+}

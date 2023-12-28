@@ -1,0 +1,13 @@
+{
+	"replace": false,
+	"values": [
+		"playershops:oak_player_shop",
+		"playershops:acacia_player_shop",
+		"playershops:birch_player_shop",
+		"playershops:crimson_player_shop",
+		"playershops:dark_oak_player_shop",
+		"playershops:jungle_player_shop",
+		"playershops:spruce_player_shop",
+		"playershops:warped_player_shop"
+	]
+}

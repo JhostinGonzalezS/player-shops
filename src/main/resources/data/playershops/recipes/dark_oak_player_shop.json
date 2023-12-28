@@ -1,0 +1,22 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        " G ",
+        "LSL",
+        "LLL"
+    ],
+    "key": {
+        "G": {
+            "tag": "forge:glass"
+        },
+        "S": {
+            "item": "minecraft:dark_oak_sign"
+        },
+        "L": {
+            "item": "minecraft:stripped_dark_oak_log"
+        }
+    },
+    "result": {
+        "item": "playershops:dark_oak_player_shop"
+    }
+}
