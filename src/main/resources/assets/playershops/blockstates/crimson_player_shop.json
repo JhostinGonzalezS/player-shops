@@ -1,8 +1,0 @@
-{
-    "variants": {
-        "facing=north": { "model": "playershops:block/crimson_player_shop" },
-        "facing=east": { "model": "playershops:block/crimson_player_shop", "y": 90 },
-        "facing=south": { "model": "playershops:block/crimson_player_shop", "y": 180 },
-        "facing=west": { "model": "playershops:block/crimson_player_shop", "y": 270 }
-    }
-}
