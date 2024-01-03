@@ -1,5 +1,6 @@
 package com.talons.playershops.block.custom;
 
+import com.talons.playershops.PlayerShopsMain;
 import com.talons.playershops.block.ModBlocks;
 import com.talons.playershops.block.entity.ModBlockEntities;
 import com.talons.playershops.block.entity.custom.PlayerShopBlockEntity;
@@ -11,7 +12,9 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -27,7 +30,10 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraftforge.common.Tags;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.network.NetworkHooks;
+import org.apache.logging.log4j.core.util.Loader;
 import org.jetbrains.annotations.Nullable;
 
 public class PlayerShopBlock extends BaseEntityBlock {
@@ -136,6 +142,8 @@ public class PlayerShopBlock extends BaseEntityBlock {
                             pPlayer.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
                         } else if(((PlayerShopBlockEntity) entity).getBuyingItemStack().isEmpty()) {
                             ((PlayerShopBlockEntity) entity).setBuyingItemStack(pPlayer.getItemInHand(InteractionHand.MAIN_HAND).copy());
+                        } else if(pPlayer.isCrouching() && PlayerShopsMain.ftbTeamsCompat) {
+                            ((PlayerShopBlockEntity) entity).swapTeamShop(pPlayer);
                         } else {
                             NetworkHooks.openScreen(((ServerPlayer) pPlayer), (PlayerShopBlockEntity) entity, pPos);
                         }
@@ -226,6 +234,9 @@ public class PlayerShopBlock extends BaseEntityBlock {
         if(this.asBlock() == ModBlocks.JUNGLE_PLAYER_SHOP_BLOCK.get()) { return new JungleShopBlockEntity(pPos, pState); }
         if(this.asBlock() == ModBlocks.SPRUCE_PLAYER_SHOP_BLOCK.get()) { return new SpruceShopBlockEntity(pPos, pState); }
         if(this.asBlock() == ModBlocks.WARPED_PLAYER_SHOP_BLOCK.get()) { return new WarpedShopBlockEntity(pPos, pState); }
+        if(this.asBlock() == ModBlocks.CHERRY_PLAYER_SHOP_BLOCK.get()) { return new CherryShopBlockEntity(pPos, pState); }
+        if(this.asBlock() == ModBlocks.MANGROVE_PLAYER_SHOP_BLOCK.get()) { return new MangroveShopBlockEntity(pPos, pState); }
+        if(this.asBlock() == ModBlocks.BAMBOO_PLAYER_SHOP_BLOCK.get()) { return new BambooShopBlockEntity(pPos, pState); }
         return null;
     }
 
@@ -240,6 +251,9 @@ public class PlayerShopBlock extends BaseEntityBlock {
         if(this.asBlock() == ModBlocks.JUNGLE_PLAYER_SHOP_BLOCK.get()) { return type == ModBlockEntities.JUNGLE_PLAYER_SHOP_BLOCK_ENTITY.get() ? PlayerShopBlockEntity::tick : null; }
         if(this.asBlock() == ModBlocks.SPRUCE_PLAYER_SHOP_BLOCK.get()) { return type == ModBlockEntities.SPRUCE_PLAYER_SHOP_BLOCK_ENTITY.get() ? PlayerShopBlockEntity::tick : null; }
         if(this.asBlock() == ModBlocks.WARPED_PLAYER_SHOP_BLOCK.get()) { return type == ModBlockEntities.WARPED_PLAYER_SHOP_BLOCK_ENTITY.get() ? PlayerShopBlockEntity::tick : null; }
+        if(this.asBlock() == ModBlocks.CHERRY_PLAYER_SHOP_BLOCK.get()) { return type == ModBlockEntities.CHERRY_PLAYER_SHOP_BLOCK_ENTITY.get() ? PlayerShopBlockEntity::tick : null; }
+        if(this.asBlock() == ModBlocks.MANGROVE_PLAYER_SHOP_BLOCK.get()) { return type == ModBlockEntities.MANGROVE_PLAYER_SHOP_BLOCK_ENTITY.get() ? PlayerShopBlockEntity::tick : null; }
+        if(this.asBlock() == ModBlocks.BAMBOO_PLAYER_SHOP_BLOCK.get()) { return type == ModBlockEntities.BAMBOO_PLAYER_SHOP_BLOCK_ENTITY.get() ? PlayerShopBlockEntity::tick : null; }
         return null;
     }
 }

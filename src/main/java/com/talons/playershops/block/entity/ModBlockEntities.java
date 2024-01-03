@@ -44,6 +44,18 @@ public class ModBlockEntities {
             BLOCK_ENTITIES.register("warped_player_shop_block_entity", () ->
                     BlockEntityType.Builder.of(WarpedShopBlockEntity::new,
                             ModBlocks.WARPED_PLAYER_SHOP_BLOCK.get()).build(null));
+    public static final RegistryObject<BlockEntityType<CherryShopBlockEntity>> CHERRY_PLAYER_SHOP_BLOCK_ENTITY =
+            BLOCK_ENTITIES.register("cherry_player_shop_block_entity", () ->
+                    BlockEntityType.Builder.of(CherryShopBlockEntity::new,
+                            ModBlocks.CHERRY_PLAYER_SHOP_BLOCK.get()).build(null));
+    public static final RegistryObject<BlockEntityType<MangroveShopBlockEntity>> MANGROVE_PLAYER_SHOP_BLOCK_ENTITY =
+            BLOCK_ENTITIES.register("mangrove_player_shop_block_entity", () ->
+                    BlockEntityType.Builder.of(MangroveShopBlockEntity::new,
+                            ModBlocks.MANGROVE_PLAYER_SHOP_BLOCK.get()).build(null));
+    public static final RegistryObject<BlockEntityType<BambooShopBlockEntity>> BAMBOO_PLAYER_SHOP_BLOCK_ENTITY =
+            BLOCK_ENTITIES.register("bamboo_player_shop_block_entity", () ->
+                    BlockEntityType.Builder.of(BambooShopBlockEntity::new,
+                            ModBlocks.BAMBOO_PLAYER_SHOP_BLOCK.get()).build(null));
 
     public static void register(IEventBus eventBus) {
         BLOCK_ENTITIES.register(eventBus);

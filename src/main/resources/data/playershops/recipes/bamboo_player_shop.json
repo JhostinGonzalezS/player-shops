@@ -1,0 +1,22 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        " G ",
+        "LSL",
+        "LLL"
+    ],
+    "key": {
+        "G": {
+            "tag": "forge:glass"
+        },
+        "S": {
+            "item": "minecraft:bamboo_sign"
+        },
+        "L": {
+            "item": "minecraft:stripped_bamboo_block"
+        }
+    },
+    "result": {
+        "item": "playershops:bamboo_player_shop"
+    }
+}

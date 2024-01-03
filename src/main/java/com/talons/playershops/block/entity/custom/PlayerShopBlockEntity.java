@@ -1,10 +1,13 @@
 package com.talons.playershops.block.entity.custom;
 
+import com.talons.playershops.PlayerShopsMain;
 import com.talons.playershops.block.ModBlocks;
 import com.talons.playershops.block.custom.PlayerShopBlock;
 import com.talons.playershops.config.PlayerShopsCommonConfigs;
 import com.talons.playershops.screen.PlayerShopMenu;
 import com.talons.utils.stacks.UtilItemStack;
+import dev.ftb.mods.ftbteams.api.FTBTeamsAPI;
+import dev.ftb.mods.ftbteams.api.TeamManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -29,6 +32,7 @@ import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
+import org.apache.logging.log4j.core.util.Loader;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -42,6 +46,7 @@ public class PlayerShopBlockEntity extends BlockEntity implements MenuProvider {
     private UUID owner = new UUID(0, 0);
     private ItemStack selling_item_stack = ItemStack.EMPTY;
     private ItemStack buying_item_stack = ItemStack.EMPTY;
+    private boolean teamShop = false;
 
     public int onTicks = 0;
     public int statingOnTicks = 30;
@@ -61,6 +66,7 @@ public class PlayerShopBlockEntity extends BlockEntity implements MenuProvider {
         int saveCoinItemCount;
         nbtTag.put("stock", stockItemHandler.serializeNBT());
         nbtTag.put("coin", coinItemHandler.serializeNBT());
+        nbtTag.putBoolean("teamShop",teamShop);
         selling_item_stack.save(sellingItemTag);
         nbtTag.put(SELLING_ITEM_STACK, sellingItemTag);
         buying_item_stack.save(buyingItemTag);
@@ -96,6 +102,7 @@ public class PlayerShopBlockEntity extends BlockEntity implements MenuProvider {
         buying_item_stack = ItemStack.of(tag.getCompound(BUYING_ITEM_STACK));
         stockItemHandler.getStackInSlot(0).setCount(stock_item_count);
         coinItemHandler.getStackInSlot(0).setCount(coin_item_count);
+        teamShop = tag.getBoolean("teamShop");
     }
 
     @Override
@@ -124,6 +131,9 @@ public class PlayerShopBlockEntity extends BlockEntity implements MenuProvider {
 
         if (!(_block instanceof PlayerShopBlock))
             return false;
+        if(teamShop && PlayerShopsMain.ftbTeamsCompat) {
+            return FTBTeamsAPI.api().getManager().arePlayersInSameTeam(owner, entity.getUUID());
+        }
         return owner.equals(entity.getUUID());
     }
 
@@ -261,6 +271,15 @@ public class PlayerShopBlockEntity extends BlockEntity implements MenuProvider {
         return buying_item_stack.copy();
     }
 
+    public void swapTeamShop(Player pPlayer) {
+        teamShop ^= true;
+        sendUpdate();
+        if(teamShop)
+            pPlayer.displayClientMessage(Component.translatable("message.playershops.team_shop"), true);
+        else
+            pPlayer.displayClientMessage(Component.translatable("message.playershops.not_team_shop"), true);
+    }
+
     private static final String NBT_OWNER_MSB = "owner_msb";
     private static final String NBT_OWNER_LSB = "owner_lsb";
     private static final String SELLING_ITEM_STACK = "selling";
@@ -276,6 +295,7 @@ public class PlayerShopBlockEntity extends BlockEntity implements MenuProvider {
         int saveCoinItemCount;
         tag.put("stock", stockItemHandler.serializeNBT());
         tag.put("coin", coinItemHandler.serializeNBT());
+        tag.putBoolean("teamShop", teamShop);
         tag.putLong(NBT_OWNER_MSB, owner.getMostSignificantBits());
         tag.putLong(NBT_OWNER_LSB, owner.getLeastSignificantBits());
         selling_item_stack.save(sellingItemTag);
@@ -304,6 +324,7 @@ public class PlayerShopBlockEntity extends BlockEntity implements MenuProvider {
         int coin_item_count = nbt.getInt(COIN_ITEM_COUNT);
         stockItemHandler.deserializeNBT(nbt.getCompound("stock"));
         coinItemHandler.deserializeNBT(nbt.getCompound("coin"));
+        teamShop = nbt.getBoolean("teamShop");
         this.owner = new UUID(nbt.getLong(NBT_OWNER_MSB), nbt.getLong(NBT_OWNER_LSB));
         selling_item_stack = ItemStack.of(nbt.getCompound(SELLING_ITEM_STACK));
         buying_item_stack = ItemStack.of(nbt.getCompound(BUYING_ITEM_STACK));

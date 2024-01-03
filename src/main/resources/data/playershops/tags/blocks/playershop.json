@@ -8,6 +8,9 @@
 		"playershops:dark_oak_player_shop",
 		"playershops:jungle_player_shop",
 		"playershops:spruce_player_shop",
-		"playershops:warped_player_shop"
+		"playershops:warped_player_shop",
+		"playershops:cherry_player_shop",
+		"playershops:mangrove_player_shop",
+		"playershops:bamboo_player_shop"
 	]
 }

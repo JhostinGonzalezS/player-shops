@@ -36,6 +36,12 @@ public class ModBlocks {
             () -> new PlayerShopBlock(BlockBehaviour.Properties.copy(Blocks.BARRIER).sound(SoundType.WOOD).mapColor(MapColor.WOOD).strength(-1.0F, 3600000.8F).noOcclusion()));
     public static final RegistryObject<Block> WARPED_PLAYER_SHOP_BLOCK = registerBlock("warped_player_shop",
             () -> new PlayerShopBlock(BlockBehaviour.Properties.copy(Blocks.BARRIER).sound(SoundType.WOOD).mapColor(MapColor.WOOD).strength(-1.0F, 3600000.8F).noOcclusion()));
+    public static final RegistryObject<Block> CHERRY_PLAYER_SHOP_BLOCK = registerBlock("cherry_player_shop",
+            () -> new PlayerShopBlock(BlockBehaviour.Properties.copy(Blocks.BARRIER).sound(SoundType.WOOD).mapColor(MapColor.WOOD).strength(-1.0F, 3600000.8F).noOcclusion()));
+    public static final RegistryObject<Block> MANGROVE_PLAYER_SHOP_BLOCK = registerBlock("mangrove_player_shop",
+            () -> new PlayerShopBlock(BlockBehaviour.Properties.copy(Blocks.BARRIER).sound(SoundType.WOOD).mapColor(MapColor.WOOD).strength(-1.0F, 3600000.8F).noOcclusion()));
+    public static final RegistryObject<Block> BAMBOO_PLAYER_SHOP_BLOCK = registerBlock("bamboo_player_shop",
+            () -> new PlayerShopBlock(BlockBehaviour.Properties.copy(Blocks.BARRIER).sound(SoundType.WOOD).mapColor(MapColor.WOOD).strength(-1.0F, 3600000.8F).noOcclusion()));
 
     private static <T extends Block> RegistryObject<T> registerBlock(String name, Supplier<T> block){
         RegistryObject<T> toReturn = BLOCKS.register(name, block);

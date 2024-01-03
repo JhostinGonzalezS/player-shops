@@ -20,6 +20,9 @@ public class RegistryClient {
         event.registerBlockEntityRenderer(ModBlockEntities.JUNGLE_PLAYER_SHOP_BLOCK_ENTITY.get(), PlayerShopTER::new);
         event.registerBlockEntityRenderer(ModBlockEntities.SPRUCE_PLAYER_SHOP_BLOCK_ENTITY.get(), PlayerShopTER::new);
         event.registerBlockEntityRenderer(ModBlockEntities.WARPED_PLAYER_SHOP_BLOCK_ENTITY.get(), PlayerShopTER::new);
+        event.registerBlockEntityRenderer(ModBlockEntities.CHERRY_PLAYER_SHOP_BLOCK_ENTITY.get(), PlayerShopTER::new);
+        event.registerBlockEntityRenderer(ModBlockEntities.MANGROVE_PLAYER_SHOP_BLOCK_ENTITY.get(), PlayerShopTER::new);
+        event.registerBlockEntityRenderer(ModBlockEntities.BAMBOO_PLAYER_SHOP_BLOCK_ENTITY.get(), PlayerShopTER::new);
     }
 
 }

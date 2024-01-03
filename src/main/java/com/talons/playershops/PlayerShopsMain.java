@@ -14,13 +14,11 @@ import net.minecraft.world.level.block.Block;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
-import net.minecraftforge.fml.event.lifecycle.InterModProcessEvent;
+import net.minecraftforge.fml.event.lifecycle.*;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.slf4j.Logger;
@@ -31,6 +29,7 @@ public class PlayerShopsMain
 {
     // Directly reference a slf4j logger
     private static final Logger LOGGER = LogUtils.getLogger();
+    public static boolean ftbTeamsCompat = false;
 
     public PlayerShopsMain()
     {
@@ -66,6 +65,9 @@ public class PlayerShopsMain
         ItemBlockRenderTypes.setRenderLayer(ModBlocks.JUNGLE_PLAYER_SHOP_BLOCK.get(), RenderType.cutout());
         ItemBlockRenderTypes.setRenderLayer(ModBlocks.SPRUCE_PLAYER_SHOP_BLOCK.get(), RenderType.cutout());
         ItemBlockRenderTypes.setRenderLayer(ModBlocks.WARPED_PLAYER_SHOP_BLOCK.get(), RenderType.cutout());
+        ItemBlockRenderTypes.setRenderLayer(ModBlocks.CHERRY_PLAYER_SHOP_BLOCK.get(), RenderType.cutout());
+        ItemBlockRenderTypes.setRenderLayer(ModBlocks.MANGROVE_PLAYER_SHOP_BLOCK.get(), RenderType.cutout());
+        ItemBlockRenderTypes.setRenderLayer(ModBlocks.BAMBOO_PLAYER_SHOP_BLOCK.get(), RenderType.cutout());
 
         MenuScreens.register(ModMenuTypes.PLAYER_SHOP_MENU.get(), PlayerShopScreen::new);
     }
@@ -90,5 +92,6 @@ public class PlayerShopsMain
     public void onServerStarting(ServerStartingEvent event)
     {
         // Do something when the server starts
+        ftbTeamsCompat = ModList.get().isLoaded("ftbteams");
     }
 }
