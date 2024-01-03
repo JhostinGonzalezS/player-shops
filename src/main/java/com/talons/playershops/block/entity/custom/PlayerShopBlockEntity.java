@@ -1,24 +1,20 @@
 package com.talons.playershops.block.entity.custom;
 
+import com.talons.playershops.PlayerShopsMain;
 import com.talons.playershops.block.ModBlocks;
 import com.talons.playershops.block.custom.PlayerShopBlock;
-import com.talons.playershops.block.entity.ModBlockEntities;
-import com.talons.playershops.item.ModItems;
+import com.talons.playershops.config.PlayerShopsCommonConfigs;
 import com.talons.playershops.screen.PlayerShopMenu;
 import com.talons.utils.stacks.UtilItemStack;
-import io.netty.buffer.ByteBuf;
+import dev.ftb.mods.ftbteams.FTBTeamsAPI;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
-import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
-import net.minecraft.world.SimpleContainer;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Inventory;
@@ -49,6 +45,7 @@ public class PlayerShopBlockEntity extends BlockEntity implements MenuProvider {
     private UUID owner = new UUID(0, 0);
     private ItemStack selling_item_stack = ItemStack.EMPTY;
     private ItemStack buying_item_stack = ItemStack.EMPTY;
+    private boolean teamShop = false;
 
     public int onTicks = 0;
     public int statingOnTicks = 30;
@@ -66,18 +63,20 @@ public class PlayerShopBlockEntity extends BlockEntity implements MenuProvider {
         CompoundTag buyingItemTag = new CompoundTag();
         int saveStockItemCount;
         int saveCoinItemCount;
-        nbtTag.put("inventory", itemHandler.serializeNBT());
+        nbtTag.put("stock", stockItemHandler.serializeNBT());
+        nbtTag.put("coin", coinItemHandler.serializeNBT());
+        nbtTag.putBoolean("teamShop", teamShop);
         selling_item_stack.save(sellingItemTag);
         nbtTag.put(SELLING_ITEM_STACK, sellingItemTag);
         buying_item_stack.save(buyingItemTag);
         nbtTag.put(BUYING_ITEM_STACK, buyingItemTag);
-        if (!itemHandler.getStackInSlot(0).isEmpty()) {
-            saveStockItemCount = itemHandler.getStackInSlot(0).getCount();
+        if (!stockItemHandler.getStackInSlot(0).isEmpty()) {
+            saveStockItemCount = stockItemHandler.getStackInSlot(0).getCount();
         } else {
             saveStockItemCount = 0;
         }
-        if (!itemHandler.getStackInSlot(1).isEmpty()) {
-            saveCoinItemCount = itemHandler.getStackInSlot(1).getCount();
+        if (!coinItemHandler.getStackInSlot(0).isEmpty()) {
+            saveCoinItemCount = coinItemHandler.getStackInSlot(0).getCount();
         } else {
             saveCoinItemCount = 0;
         }
@@ -96,11 +95,13 @@ public class PlayerShopBlockEntity extends BlockEntity implements MenuProvider {
         CompoundTag tag = pkt.getTag();
         int stock_item_count = tag.getInt(STOCK_ITEM_COUNT);
         int coin_item_count = tag.getInt(COIN_ITEM_COUNT);
-        itemHandler.deserializeNBT(tag.getCompound("inventory"));
+        stockItemHandler.deserializeNBT(tag.getCompound("stock"));
+        coinItemHandler.deserializeNBT(tag.getCompound("coin"));
+        teamShop = tag.getBoolean("teamShop");
         selling_item_stack = ItemStack.of(tag.getCompound(SELLING_ITEM_STACK));
         buying_item_stack = ItemStack.of(tag.getCompound(BUYING_ITEM_STACK));
-        itemHandler.getStackInSlot(0).setCount(stock_item_count);
-        itemHandler.getStackInSlot(1).setCount(coin_item_count);
+        stockItemHandler.getStackInSlot(0).setCount(stock_item_count);
+        coinItemHandler.getStackInSlot(0).setCount(coin_item_count);
     }
 
     @Override
@@ -129,10 +130,13 @@ public class PlayerShopBlockEntity extends BlockEntity implements MenuProvider {
 
         if (!(_block instanceof PlayerShopBlock))
             return false;
+        if(teamShop && PlayerShopsMain.ftbTeamsCompat) {
+            return FTBTeamsAPI.arePlayersInSameTeam(owner, entity.getUUID());
+        }
         return owner.equals(entity.getUUID());
     }
 
-    public final ItemStackHandler itemHandler = new ItemStackHandler(2) {
+    public final ItemStackHandler stockItemHandler = new ItemStackHandler(1) {
         @Override
         protected void onContentsChanged(int slot) {
             sendUpdate();
@@ -143,15 +147,36 @@ public class PlayerShopBlockEntity extends BlockEntity implements MenuProvider {
 
         @Override
         public boolean isItemValid(int slot, @NonNull ItemStack stack) {
-            return switch (slot) {
-                case 0 -> stack.getItem() == selling_item_stack.getItem();
-                case 1 -> false;
-                default -> super.isItemValid(slot, stack);
-            };
+            return stack.getItem() == selling_item_stack.getItem();
         }
     };
 
-    private LazyOptional<IItemHandler> lazyItemHandler = LazyOptional.empty();
+    private LazyOptional<IItemHandler> lazyStockItemHandler = LazyOptional.of(() -> stockItemHandler);
+
+    public final ItemStackHandler coinItemHandler = new ItemStackHandler(1) {
+        @Override
+        protected void onContentsChanged(int slot) {
+            sendUpdate();
+            if (!level.isClientSide) {
+                saveAdditional(new CompoundTag());
+            }
+        }
+
+        @Override
+        public boolean isItemValid(int slot, @NonNull ItemStack stack) {
+            return false;
+        }
+    };
+
+    public LazyOptional<IItemHandler> getStockOptional() {
+        return this.lazyStockItemHandler;
+    }
+
+    public LazyOptional<IItemHandler> getCoinOptional() {
+        return this.lazyCoinItemHandler;
+    }
+
+    private LazyOptional<IItemHandler> lazyCoinItemHandler = LazyOptional.of(() -> coinItemHandler);
 
     public PlayerShopBlockEntity(BlockEntityType<?> entityType, BlockPos p_155229_, BlockState p_155230_) {
         super(entityType, p_155229_, p_155230_);
@@ -160,13 +185,13 @@ public class PlayerShopBlockEntity extends BlockEntity implements MenuProvider {
     public void dropShop(Player player, BlockPos pos) {
         dropInv(player.position());
 
+        spawn(level, player.position(), new ItemStack(player.level.getBlockState(pos).getBlock().asItem()));
         player.level.removeBlock(pos, true);
-        spawn(level, player.position(), new ItemStack(ModBlocks.OAK_PLAYER_SHOP_BLOCK.get()));
     }
 
     private void dropInv(Vec3 pos) {
-        ItemStack stockStack = itemHandler.getStackInSlot(0);
-        ItemStack profitStack = itemHandler.getStackInSlot(1);
+        ItemStack stockStack = stockItemHandler.getStackInSlot(0);
+        ItemStack profitStack = coinItemHandler.getStackInSlot(0);
 
         int stockStackRemaining = stockStack.getCount();
         int profitStackRemaining = profitStack.getCount();
@@ -194,7 +219,7 @@ public class PlayerShopBlockEntity extends BlockEntity implements MenuProvider {
 
     @Override
     public Component getDisplayName() {
-        return new TextComponent("Your Shop");
+        return new TranslatableComponent("title.playershops.shop");
     }
 
     @Nullable
@@ -205,24 +230,26 @@ public class PlayerShopBlockEntity extends BlockEntity implements MenuProvider {
 
     @Nonnull
     @Override
-    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @javax.annotation.Nullable Direction side) {
+    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
         if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
-            return lazyItemHandler.cast();
+            if (side == Direction.DOWN) {
+                if (PlayerShopsCommonConfigs.HoppersExtract.get()) {
+                    return lazyCoinItemHandler.cast();
+                }
+            }
+            else {
+                return lazyStockItemHandler.cast();
+            }
         }
 
         return super.getCapability(cap, side);
     }
 
     @Override
-    public void onLoad() {
-        super.onLoad();
-        lazyItemHandler = LazyOptional.of(() -> itemHandler);
-    }
-
-    @Override
     public void invalidateCaps() {
         super.invalidateCaps();
-        lazyItemHandler.invalidate();
+        lazyStockItemHandler.invalidate();
+        lazyCoinItemHandler.invalidate();
     }
 
     public void setSellingItemStack(ItemStack itemStack) {
@@ -243,6 +270,15 @@ public class PlayerShopBlockEntity extends BlockEntity implements MenuProvider {
         return buying_item_stack.copy();
     }
 
+    public void swapTeamShop(Player pPlayer) {
+        teamShop ^= true;
+        sendUpdate();
+        if(teamShop)
+            pPlayer.displayClientMessage(new TranslatableComponent("message.playershops.team_shop"), true);
+        else
+            pPlayer.displayClientMessage(new TranslatableComponent("message.playershops.not_team_shop"), true);
+    }
+
     private static final String NBT_OWNER_MSB = "owner_msb";
     private static final String NBT_OWNER_LSB = "owner_lsb";
     private static final String SELLING_ITEM_STACK = "selling";
@@ -256,20 +292,22 @@ public class PlayerShopBlockEntity extends BlockEntity implements MenuProvider {
         CompoundTag buyingItemTag = new CompoundTag();
         int saveStockItemCount;
         int saveCoinItemCount;
-        tag.put("inventory", itemHandler.serializeNBT());
+        tag.put("stock", stockItemHandler.serializeNBT());
+        tag.put("coin", coinItemHandler.serializeNBT());
+        tag.putBoolean("teamShop", teamShop);
         tag.putLong(NBT_OWNER_MSB, owner.getMostSignificantBits());
         tag.putLong(NBT_OWNER_LSB, owner.getLeastSignificantBits());
         selling_item_stack.save(sellingItemTag);
         tag.put(SELLING_ITEM_STACK, sellingItemTag);
         buying_item_stack.save(buyingItemTag);
         tag.put(BUYING_ITEM_STACK, buyingItemTag);
-        if (!itemHandler.getStackInSlot(0).isEmpty()) {
-            saveStockItemCount = itemHandler.getStackInSlot(0).getCount();
+        if (!stockItemHandler.getStackInSlot(0).isEmpty()) {
+            saveStockItemCount = stockItemHandler.getStackInSlot(0).getCount();
         } else {
             saveStockItemCount = 0;
         }
-        if (!itemHandler.getStackInSlot(1).isEmpty()) {
-            saveCoinItemCount = itemHandler.getStackInSlot(1).getCount();
+        if (!coinItemHandler.getStackInSlot(0).isEmpty()) {
+            saveCoinItemCount = coinItemHandler.getStackInSlot(0).getCount();
         } else {
             saveCoinItemCount = 0;
         }
@@ -283,12 +321,14 @@ public class PlayerShopBlockEntity extends BlockEntity implements MenuProvider {
         super.load(nbt);
         int stock_item_count = nbt.getInt(STOCK_ITEM_COUNT);
         int coin_item_count = nbt.getInt(COIN_ITEM_COUNT);
-        itemHandler.deserializeNBT(nbt.getCompound("inventory"));
+        stockItemHandler.deserializeNBT(nbt.getCompound("stock"));
+        coinItemHandler.deserializeNBT(nbt.getCompound("coin"));
+        teamShop = nbt.getBoolean("teamShop");
         this.owner = new UUID(nbt.getLong(NBT_OWNER_MSB), nbt.getLong(NBT_OWNER_LSB));
         selling_item_stack = ItemStack.of(nbt.getCompound(SELLING_ITEM_STACK));
         buying_item_stack = ItemStack.of(nbt.getCompound(BUYING_ITEM_STACK));
-        itemHandler.getStackInSlot(0).setCount(stock_item_count);
-        itemHandler.getStackInSlot(1).setCount(coin_item_count);
+        stockItemHandler.getStackInSlot(0).setCount(stock_item_count);
+        coinItemHandler.getStackInSlot(0).setCount(coin_item_count);
     }
 
     public static <T extends BlockEntity> void tick(Level level, BlockPos pos, BlockState state, T be) {

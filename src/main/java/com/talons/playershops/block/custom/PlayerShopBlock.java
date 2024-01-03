@@ -1,19 +1,20 @@
 package com.talons.playershops.block.custom;
 
+import com.talons.playershops.PlayerShopsMain;
 import com.talons.playershops.block.ModBlocks;
 import com.talons.playershops.block.entity.ModBlockEntities;
 import com.talons.playershops.block.entity.custom.PlayerShopBlockEntity;
 import com.talons.playershops.block.entity.custom.varients.*;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -134,10 +135,12 @@ public class PlayerShopBlock extends BaseEntityBlock {
                     if(pHand == InteractionHand.MAIN_HAND) {
                         if(((PlayerShopBlockEntity) entity).getSellingItemStack().isEmpty()) {
                             ((PlayerShopBlockEntity) entity).setSellingItemStack(pPlayer.getItemInHand(InteractionHand.MAIN_HAND).copy());
-                            ((PlayerShopBlockEntity) entity).itemHandler.setStackInSlot(0, pPlayer.getItemInHand(InteractionHand.MAIN_HAND));
+                            ((PlayerShopBlockEntity) entity).stockItemHandler.setStackInSlot(0, pPlayer.getItemInHand(InteractionHand.MAIN_HAND));
                             pPlayer.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
                         } else if(((PlayerShopBlockEntity) entity).getBuyingItemStack().isEmpty()) {
                             ((PlayerShopBlockEntity) entity).setBuyingItemStack(pPlayer.getItemInHand(InteractionHand.MAIN_HAND).copy());
+                        } else if(pPlayer.isCrouching() && PlayerShopsMain.ftbTeamsCompat) {
+                            ((PlayerShopBlockEntity) entity).swapTeamShop(pPlayer);
                         } else {
                             NetworkHooks.openGui(((ServerPlayer) pPlayer), (PlayerShopBlockEntity) entity, pPos);
                         }
@@ -145,30 +148,30 @@ public class PlayerShopBlock extends BaseEntityBlock {
                 }
                 else {
                     if(((PlayerShopBlockEntity) entity).getSellingItemStack().getCount() <=
-                            ((PlayerShopBlockEntity) entity).itemHandler.getStackInSlot(0).getCount() &&
-                            ((PlayerShopBlockEntity) entity).itemHandler.getStackInSlot(0).getItem().equals(
+                            ((PlayerShopBlockEntity) entity).stockItemHandler.getStackInSlot(0).getCount() &&
+                            ((PlayerShopBlockEntity) entity).stockItemHandler.getStackInSlot(0).getItem().equals(
                                     ((PlayerShopBlockEntity) entity).getSellingItemStack().getItem())) {
 
-                        if(((PlayerShopBlockEntity) entity).itemHandler.getStackInSlot(1).getCount() <=
+                        if(((PlayerShopBlockEntity) entity).coinItemHandler.getStackInSlot(0).getCount() <=
                                 Math.max(((PlayerShopBlockEntity) entity).getBuyingItemStack().getMaxStackSize() * 10, 64) - ((PlayerShopBlockEntity) entity).getBuyingItemStack().getCount() &&
-                                (((PlayerShopBlockEntity) entity).itemHandler.getStackInSlot(1).getItem().equals(
+                                (((PlayerShopBlockEntity) entity).coinItemHandler.getStackInSlot(0).getItem().equals(
                                         ((PlayerShopBlockEntity) entity).getBuyingItemStack().getItem()) ||
-                                        ((PlayerShopBlockEntity) entity).itemHandler.getStackInSlot(1).isEmpty())) {
+                                        ((PlayerShopBlockEntity) entity).coinItemHandler.getStackInSlot(0).isEmpty())) {
 
                             if(pHand == InteractionHand.MAIN_HAND) {
-                                if(pPlayer.getItemInHand(InteractionHand.MAIN_HAND)
-                                        .sameItem(((PlayerShopBlockEntity) entity).getBuyingItemStack()) &&
+                                if(pPlayer.getItemInHand(InteractionHand.MAIN_HAND).getItem()
+                                        == (((PlayerShopBlockEntity) entity).getBuyingItemStack()).getItem() &&
                                         pPlayer.getItemInHand(InteractionHand.MAIN_HAND).getCount() >=
                                                 ((PlayerShopBlockEntity) entity).getBuyingItemStack().getCount()) {
 
                                     if(pPlayer.addItem(((PlayerShopBlockEntity) entity).getSellingItemStack().copy())) {
                                         pPlayer.getItemInHand(InteractionHand.MAIN_HAND).shrink(((PlayerShopBlockEntity) entity).getBuyingItemStack().getCount());
-                                        ((PlayerShopBlockEntity) entity).itemHandler.getStackInSlot(0).shrink(((PlayerShopBlockEntity) entity).getSellingItemStack().getCount());
-                                        if(((PlayerShopBlockEntity) entity).itemHandler.getStackInSlot(1).isEmpty()) {
-                                            ((PlayerShopBlockEntity) entity).itemHandler.setStackInSlot(1, ((PlayerShopBlockEntity) entity).getBuyingItemStack().copy());
+                                        ((PlayerShopBlockEntity) entity).stockItemHandler.getStackInSlot(0).shrink(((PlayerShopBlockEntity) entity).getSellingItemStack().getCount());
+                                        if(((PlayerShopBlockEntity) entity).coinItemHandler.getStackInSlot(0).isEmpty()) {
+                                            ((PlayerShopBlockEntity) entity).coinItemHandler.setStackInSlot(0, ((PlayerShopBlockEntity) entity).getBuyingItemStack().copy());
                                         }
                                         else {
-                                            ((PlayerShopBlockEntity) entity).itemHandler.getStackInSlot(1).grow(((PlayerShopBlockEntity) entity).getBuyingItemStack().getCount());
+                                            ((PlayerShopBlockEntity) entity).coinItemHandler.getStackInSlot(0).grow(((PlayerShopBlockEntity) entity).getBuyingItemStack().getCount());
                                         }
                                         ((PlayerShopBlockEntity) entity).onTicks = ((PlayerShopBlockEntity) entity).statingOnTicks;
                                         if(((PlayerShopBlockEntity) entity).currentPowerLevel < 15) { ((PlayerShopBlockEntity) entity).currentPowerLevel++; }
@@ -177,21 +180,21 @@ public class PlayerShopBlock extends BaseEntityBlock {
                                         entity.saveWithoutMetadata();
                                     }
                                     else {
-                                        pPlayer.displayClientMessage(new TextComponent("Your inventory is full, please clear space"), true);
+                                        pPlayer.displayClientMessage(new TranslatableComponent("message.playershops.inv_full"), true);
                                     }
 
                                 }
                                 else {
-                                    pPlayer.displayClientMessage(new TextComponent("Insufficient funds, please hold the payment item"), true);
+                                    pPlayer.displayClientMessage(new TranslatableComponent("message.playershops.no_funds"), true);
                                 }
                             }
                         }
                         else {
-                            pPlayer.displayClientMessage(new TextComponent("Shop profit slot is full"), true);
+                            pPlayer.displayClientMessage(new TranslatableComponent("message.playershops.shop_full_profit"), true);
                         }
                     }
                     else {
-                        pPlayer.displayClientMessage(new TextComponent("Shop is out of stock"), true);
+                        pPlayer.displayClientMessage(new TranslatableComponent("message.playershops.shop_empty_stock"), true);
                     }
                 }
             } else {

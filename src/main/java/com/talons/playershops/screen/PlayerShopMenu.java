@@ -1,6 +1,5 @@
 package com.talons.playershops.screen;
 
-import com.talons.playershops.block.ModBlocks;
 import com.talons.playershops.block.entity.custom.PlayerShopBlockEntity;
 import com.talons.playershops.screen.slot.ShopCoinSlot;
 import com.talons.playershops.screen.slot.ShopStockSlot;
@@ -13,7 +12,6 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.items.CapabilityItemHandler;
 
 public class PlayerShopMenu extends AbstractContainerMenu {
 
@@ -33,9 +31,12 @@ public class PlayerShopMenu extends AbstractContainerMenu {
         addPlayerInventory(inv);
         addPlayerHotbar(inv);
 
-        this.blockEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(handler -> {
+        this.blockEntity.getStockOptional().ifPresent(handler -> {
             this.addSlot(new ShopStockSlot(handler, 0, 80, 12, blockEntity));
-            this.addSlot(new ShopCoinSlot(handler, 1, 80, 60));
+        });
+
+        this.blockEntity.getCoinOptional().ifPresent(handler -> {
+            this.addSlot(new ShopCoinSlot(handler, 0, 80, 60));
         });
 
     }

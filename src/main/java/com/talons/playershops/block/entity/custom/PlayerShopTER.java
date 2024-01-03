@@ -144,10 +144,10 @@ public class PlayerShopTER implements BlockEntityRenderer<PlayerShopBlockEntity>
         // MIDDLE PART: STOCK
 
         int stock;
-        if (tile.itemHandler.getStackInSlot(0).isEmpty()) {
+        if (tile.stockItemHandler.getStackInSlot(0).isEmpty()) {
             stock = 0;
         } else {
-            stock = (int)Math.floor((float)tile.itemHandler.getStackInSlot(0).getCount() / (float)renderStack2.getCount());
+            stock = (int)Math.floor((float)tile.stockItemHandler.getStackInSlot(0).getCount() / (float)renderStack2.getCount());
         }
         matrix.pushPose();
         matrix.scale(.0125f, .0125f, .0125f);

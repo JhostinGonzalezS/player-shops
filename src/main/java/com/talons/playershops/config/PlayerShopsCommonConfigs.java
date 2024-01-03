@@ -13,6 +13,7 @@ public class PlayerShopsCommonConfigs {
     public static final ForgeConfigSpec.ConfigValue<Long> AllowanceTimeOfDay;
     public static final ForgeConfigSpec.ConfigValue<String> AllowanceMessage;
     public static final ForgeConfigSpec.ConfigValue<String> AllowanceFailMessage;
+    public static final ForgeConfigSpec.ConfigValue<Boolean> HoppersExtract;
 
     static {
         BUILDER.push("Common configs for Player Shops");
@@ -29,6 +30,8 @@ public class PlayerShopsCommonConfigs {
                 .define("AllowanceMessage", "The sun rises and you gain your allowance");
         AllowanceFailMessage = BUILDER.comment("The message displayed to players when they cant get their allowance, probably due to full inventory")
                 .define("AllowanceFailMessage", "The sun rises but your inventory was full");
+        HoppersExtract = BUILDER.comment("Whether or not Hoppers can take the profit out of shops")
+                .define("HoppersExtract", false);
 
         BUILDER.pop();
         SPEC = BUILDER.build();

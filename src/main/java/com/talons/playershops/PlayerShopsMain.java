@@ -12,12 +12,13 @@ import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
 import net.minecraftforge.fml.event.lifecycle.InterModProcessEvent;
@@ -31,6 +32,7 @@ public class PlayerShopsMain
 {
     // Directly reference a slf4j logger
     private static final Logger LOGGER = LogUtils.getLogger();
+    public static boolean ftbTeamsCompat = false;
 
     public PlayerShopsMain()
     {
@@ -56,7 +58,7 @@ public class PlayerShopsMain
     }
 
 
-    private void clientSetup(final FMLCommonSetupEvent event)
+    private void clientSetup(final FMLClientSetupEvent event)
     {
         ItemBlockRenderTypes.setRenderLayer(ModBlocks.OAK_PLAYER_SHOP_BLOCK.get(), RenderType.cutout());
         ItemBlockRenderTypes.setRenderLayer(ModBlocks.ACACIA_PLAYER_SHOP_BLOCK.get(), RenderType.cutout());
@@ -90,17 +92,6 @@ public class PlayerShopsMain
     public void onServerStarting(ServerStartingEvent event)
     {
         // Do something when the server starts
-    }
-
-    // You can use EventBusSubscriber to automatically subscribe events on the contained class (this is subscribing to the MOD
-    // Event bus for receiving Registry Events)
-    @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
-    public static class RegistryEvents
-    {
-        @SubscribeEvent
-        public static void onBlocksRegistry(final RegistryEvent.Register<Block> blockRegistryEvent)
-        {
-            // Register a new block here
-        }
+        ftbTeamsCompat = ModList.get().isLoaded("ftbteams");
     }
 }
