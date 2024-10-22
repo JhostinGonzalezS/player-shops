@@ -1,0 +1,22 @@
+{
+    "block.playershops.oak_player_shop": "Tienda de Jugador de Roble",
+    "block.playershops.acacia_player_shop": "Tienda de Jugador de Acacia",
+    "block.playershops.birch_player_shop": "Tienda de Jugador de Abedul",
+    "block.playershops.crimson_player_shop": "Tienda de Jugador Carmesí",
+    "block.playershops.dark_oak_player_shop": "Tienda de Jugador de Roble Oscuro",
+    "block.playershops.jungle_player_shop": "Tienda de Jugador de Jungla",
+    "block.playershops.spruce_player_shop": "Tienda de Jugador de Pícea",
+    "block.playershops.warped_player_shop": "Tienda de Jugador Distorsionada",
+    "block.playershops.cherry_player_shop": "Tienda de Jugador de Cerezo",
+    "block.playershops.mangrove_player_shop": "Tienda de Jugador de Mangle",
+    "block.playershops.bamboo_player_shop": "Tienda de Jugador de Bambú",
+
+    "message.playershops.inv_full": "Tu inventario está lleno, por favor libera espacio",
+    "message.playershops.no_funds": "Fondos insuficientes, por favor sostén el ítem de pago",
+    "message.playershops.shop_full_profit": "El espacio de ganancias de la tienda está lleno",
+    "message.playershops.shop_empty_stock": "La tienda no tiene stock",
+    "message.playershops.team_shop": "Tu equipo ahora puede editar esta tienda",
+    "message.playershops.not_team_shop": "Tu equipo ya no puede editar esta tienda",
+
+    "title.playershops.shop": "Tu Tienda"
+}
